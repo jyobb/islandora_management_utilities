@@ -15,7 +15,7 @@ function islandora_management_utilities_drush_command() {
   $items['islandora_checkstreams'] = array(
     'aliases' => array('icd'),
     'description' => 'Check datastream exists for all object in a collection.',
-    'drupal dependencies' => array('islandora_mangement_utilities'),
+    'drupal dependencies' => array('islandora_management_utilities'),
     'examples' => array(
      'drush -v --user=fedora_admin --uri=http://islandorasev_dev.ca islandora_checkstreams --parentpid="apid:111" --datastream="MODS" --outfile="outfilename.txt"',
     ),
@@ -39,7 +39,7 @@ function islandora_management_utilities_drush_command() {
   $items['islandora_checkmimes'] = array(
     'aliases' => array('icm'),
     'description' => 'Check the mimetypes of a collection are correct.',
-    'drupal dependencies' => array('islandora_checkstreams'),
+    'drupal dependencies' => array('islandora_management_utilities'),
     'examples' => array(
      'drush -v --user=fedora_admin --uri=http://islandorasev_dev.ca islandora_checkmimes --parentpid="apid:111" --datastream="MODS" --outfile="outfilename.txt"',
     ),
@@ -63,7 +63,7 @@ function islandora_management_utilities_drush_command() {
   $items['islandora_fixmimes'] = array(
     'aliases' => array('ifm'),
     'description' => 'Change object mimetype.',
-    'drupal dependencies' => array('islandora_checkstreams'),
+    'drupal dependencies' => array('islandora_management_utilities'),
     'examples' => array(
      'drush -v --user=fedora_admin --uri=http://islandorasev_dev.ca islandora_fixmimes --parentpid="apid:111" --datastream="MODS" --currmime="image/tif" --newmime="image/tiff" --outfile="outfilename.txt"',
     ),
@@ -213,20 +213,19 @@ function drush_islandora_management_utilities_validate() {
 }
 
 
-/*
-function drush_islandora_checkstreams(){
+
+function drush_islandora_management_utilities_islandora_checkstreams(){
 
   $parentPID = drush_get_option('parentpid');
   $dataStream = drush_get_option('datastream');
   $outFilename = drush_get_option('outfile');
 
-  $base = drupal_get_path('module', 'islandora_checkstreams');
+  $base = drupal_get_path('module', 'islandora_management_utilities');
 
   $filepath = DRUPAL_ROOT . '/' . $base . '/data/' . $outFilename;
 
-module_load_include('inc', 'islandora_checkstreams', 'includes/analyzer');
+module_load_include('inc', 'islandora_management_utilities', 'includes/analyzer');
 
 islandora_get_missing_datastreams($parentPID, $dataStream, $filepath );
 
 }
-*/
