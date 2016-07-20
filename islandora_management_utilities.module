@@ -1,0 +1,142 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations.
+ */
+
+
+
+/**
+ * Implements hook_help().
+ */
+
+function islandora_management_utilities_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#islandora_management_utitlities":
+      return '' . t("Test collection objects for datastreams and reindex collections") . '';
+      break;
+  }
+} 
+
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_management_utilities_menu() {
+  $items = array();
+
+  $items['metadata_management_utilities'] = array(
+    'title' => 'Reindex islandora collection',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_management_utilities_reindex_form'),
+    'access arguments' => array('administer site configuration'),
+    'expanded' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/*
+ * implements hook_form()
+ * @params $form form_state
+ *
+ * Form for selecting reindex parameters
+ *
+ */
+function islandora_management_utilities_reindex_form($form, &$form_state){
+
+
+  $form['collection'] = array(
+    '#type' => 'textfield',
+    '#size' => 100,
+    '#required' => TRUE,
+    '#title' => t('PID of Collection'),
+  );
+  $form['username'] = array(
+    '#type' => 'textfield',
+    '#size' => 20,
+    '#required' => TRUE,
+    '#title' => t('Fedora Username'),
+  );
+  $form['password'] = array(
+    '#type' => 'textfield',
+    '#size' => 20,
+    '#required' => TRUE,
+    '#title' => t('Fedora Password'),
+  );
+  $form['do_children'] = array(
+    '#type' => 'select',
+    '#title' => t('Process Child Collections'),
+    '#options' => array(0 => t('No'), 1 => t('Yes')),
+    '#description' => t('Process child collections.'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'submit',
+  );
+
+return $form;
+
+}
+
+/*
+ * implements hook_submit
+ *
+ * Collect input and pass to processing functions
+ *
+ */
+function islandora_management_utilities_reindex_form_submit($form, &$form_state){
+
+
+$params = array('parentPID' => $form_state['values']['collection'], 
+                'reindexcollection' => $form_state['values']['do_children'],
+                'user' => $form_state['values']['username'],
+                'pass' => $form_state['values']['password'],
+               );  
+
+module_load_include('inc', 'islandora_management_utilities', 'includes/reindexcollection');
+
+islandora_reindex_collection($params);
+
+return $form;
+
+}
+
+
+/*
+ * implements hook_theme
+ *
+ * Theme functions for output
+ *
+ */
+function islandora_management_utilities_theme($existing, $type, $theme, $path) {
+    return array(
+        'reindex_result' => array(
+            'variables' => array(
+              'resultArray' => NULL,
+            ),
+            'template' => 'theme/islandora-management-utilities-reindex-result', // do not include .tpl.php
+            'path' => drupal_get_path('module', 'islandora_management_utilities'), '/theme',
+        ),
+        /* Keeping around for example
+        'element_count' => array(
+            'variables' => array(
+              'result_id' => NULL,              
+              'title' => NULL,
+              'pid' => NULL,
+              'query_time' => NULL,
+              'countArray' => NULL,
+              'stream' => NULL,
+              'record_count' => NULL,
+              'path_data' => NULL,
+            ),
+            'template' => 'theme/islandora-metadata-analyzer-element-count', // do not include .tpl.php
+            'path' => drupal_get_path('module', 'islandora_metadata_analyzer'), '/theme',
+        ),
+        */
+    );
+}
+
+

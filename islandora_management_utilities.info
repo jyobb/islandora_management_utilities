@@ -1,0 +1,9 @@
+name = Islandora Management Utilities 
+dependencies[] = islandora
+description = Islandora Management Utilties
+configure = admin/islandora
+package = USask
+version = 7.x-dev
+core = 7.x
+
+
