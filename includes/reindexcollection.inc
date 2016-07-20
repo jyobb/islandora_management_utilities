@@ -19,40 +19,62 @@ function islandora_reindex_collection($params){
 
   collect_pids($pid, $getchildren, $pid_list);
 
-  $status = reindex_list($pid_list, $user, $pass);
-
-  $output = theme('reindex_result', array('resultArray' => $status));
-
-  return $output;
+  reindex_list($pid_list, $user, $pass);
 
 }
 
 
+/*
+<input type="hidden" value="updateIndex" name="operation">
+<input type="hidden" value="fromPid" name="action">
+<input type="text" value="" size="30" name="value">
+<input type="submit" value="updateIndex fromPid">
+
+
+input type="hidden" value="updateIndex" name="operation">
+<input type="hidden" value="optimize" name="action">
+<input type="submit" value="updateIndex optimize">
+
+   $url = $base_url . ":8080/fedoragsearch/rest?operation/updateIndex&action=optimize;
+*/
 
 function reindex_list($pid_list, $user, $pass) {
 
 $status = array();
-$username = $user;
-$password = $pass;
 global $base_url;
 
-
+$handle = fopen("/var/www/html/drupal/sites/all/modules/islandora_management_utilities/data/reindex_results.txt", "w");
+$date = date("Y-m-d H:i:s");
+fwrite($handle, $date . "\n");
+$output = array();
 foreach($pid_list as $p){
-   $url = "http://" . $base_url . ":8080/fedoragsearch/rest?operation/updateIndex&action=fromPid&value=" . $p;
+   $url = $base_url . ":8080/fedoragsearch/rest?operation/updateIndex&action=fromPid&value=" . $p;
+
    $ch = curl_init();
    curl_setopt($ch, CURLOPT_URL, $url);
    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-   curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+   curl_setopt($ch, CURLOPT_USERPWD, "$user:$pass");
    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
    $output = curl_exec($ch);
    $info = curl_getinfo($ch);
-   $status[$p] = $info['http_code'];
+   fwrite($handle, "PID= ". $p . " http_code " . $info['http_code'] . "\n");
    curl_close($ch);
-
 }
 
+   $optimize_url = $base_url . ":8080/fedoragsearch/rest?operation=updateIndex&action=optimize";
+   $ch = curl_init();
+   curl_setopt($ch, CURLOPT_URL, $optimize_url);
+   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+   curl_setopt($ch, CURLOPT_USERPWD, "$user:$pass");
+   curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+   $output = curl_exec($ch);
+   $info = curl_getinfo($ch);
+   fwrite($handle, "Optimize http_code " . $info['http_code'] . "\n");
+   curl_close($ch);
 
-return $status;
+fclose($handle);
+
+
 
 }
 
