@@ -146,7 +146,7 @@ function drush_islandora_management_utilities_islandora_reindex_collection(){
 
 module_load_include('inc', 'islandora_management_utilities', 'includes/reindexcollection');
 
-islandora_reindex_collection($parentPID, $reindexchildren);
+islandora_reindex_collection($params);
 
 }
 
